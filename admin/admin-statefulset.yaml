@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: admin-statefulset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin
+  serviceName: admin-svc
+  template:
+    metadata:
+      name: admin
+      labels:
+        app: admin
+    spec:
+      containers:
+        - name: admin-container
+          image: aluracursos/sistema-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: admin-config-map
+          volumeMounts:
+            - name: images
+              mountPath: /var/www/html/uploads
+            - name: session
+              mountPath: /tmp
+      volumes:
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-pvc
+        - name: session
+          persistentVolumeClaim:
+            claimName: session-pvc
